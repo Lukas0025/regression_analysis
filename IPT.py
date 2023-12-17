@@ -1,6 +1,6 @@
 # IPT11
 # @autor Lukáš Plevač
-# @date 8.12.2020
+# @date 17.12.2023
 
 import numpy as np
 import math
@@ -524,15 +524,21 @@ def PearsonKorelKoef(Xi, Yi):
     n      = Xi.size
 
     # Vzorec https://portal.matematickabiologie.cz/index.php?pg=aplikovana-analyza-klinickych-a-biologickych-dat--biostatistika-pro-matematickou-biologii--zaklady-korelacni-analyzy--pearsonuv-korelacni-koeficient--vypocet-pearsonova-korelacniho-koeficientu
-    p = ((Xi - PrumX) * (Yi - PrumY)).sum() / math.sqrt(
-        np.power(Xi - PrumX, 2).sum() * np.power(Yi - PrumY, 2).sum()
+    #p = ((Xi - PrumX) * (Yi - PrumY)).sum() / math.sqrt(
+    #    np.power(Xi - PrumX, 2).sum() * np.power(Yi - PrumY, 2).sum()
+    #)
+
+    p = ((Xi * Yi).sum() - n * PrumX * PrumY) / np.sqrt(
+        (np.power(Xi, 2).sum() - n * np.power(PrumX, 2)) *
+        (np.power(Yi, 2).sum() - n * np.power(PrumY, 2))
     )
 
     return p
 
 ##
-## Non-correct
-##
+# Pouzivame kdyz je z normalniho rozdeleni a chceme dokazat neexistenci 
+# linearni zavislosti
+#
 def XiYidependenceNormal(Xi, Yi):
     p = PearsonKorelKoef(Xi, Yi)
     print("#####################")
@@ -545,10 +551,10 @@ def XiYidependenceNormal(Xi, Yi):
     print("Pearsonův korelační koeficient")
     print("#####################")
 
-    T = (p / (math.sqrt(1 - (p ** 2)))) * math.sqrt(n - 2)
+    T = (p / (math.sqrt(1 - np.power(p, 2)))) * math.sqrt(n - 2)
 
     print("#####################")
-    print("T = p / sqrt(1 - p **2) * sqrt(n - 2) = {}".format(
+    print("T = (p / sqrt(1 - p **2)) * sqrt(n - 2) = {}".format(
         T
     ))
     print("n = {}".format(
@@ -560,7 +566,7 @@ def XiYidependenceNormal(Xi, Yi):
     print("Dopočítej!!!!")
     print("H0: Xi a Yi jsou nezávislé")
     print("H1: Xi a Yi nejsou nezávislé")
-    print("W = { T: |T| >= t(1 - apha / 2)(n-2)} <= zamítne H0 (Pokud bude plati jsou závislé)")
+    print("W = { T: |T| >= t(1 - apha / 2)(n-2)} <= zamítne H0 pokud do intervalu T padne")
     print("#####################")
 
 def SpearmanKorelKoef(Xi, Yi):
@@ -633,22 +639,24 @@ def XiYidependenceSpojit(Xi, Yi):
 # Linear
 ##
 Xi = np.array([
-    25, 31, 40, 64, 34, 15, 57, 45
+    4, 4, 3, 4, 4, 6, 4, 7, 4, 4, 5, 4
 ])
 
 Yi = np.array([
-    21, 22, 33, 46, 23, 12, 55, 40
+    311, 313, 237, 313, 281, 446, 314, 494, 322, 302, 387, 334
 ])
 
-#beta0, beta1 = regreseLinearBetas(Xi, Yi)
+"""
+beta0, beta1 = regreseLinearBetas(Xi, Yi)
 
-#Y = regreseLinearPredict(beta0, beta1, 20)
-#print("Y is {}".format(Y))
+Y = regreseLinearPredict(beta0, beta1, 2)
+print("Y is {}".format(Y))
 
-#Se = regreseLinearGetSigmaPow2(beta0, beta1, Xi, Yi)
-##SigmaPow2 = regreseLinearGetSigmaPow2(beta0, beta1, Xi, Yi)
+Se = regreseLinearGetSigmaPow2(beta0, beta1, Xi, Yi)
+SigmaPow2 = regreseLinearGetSigmaPow2(beta0, beta1, Xi, Yi)
 
-#Rpow2 = regreseLinearGetQvality(beta0, beta1, Xi, Yi)
+Rpow2 = regreseLinearGetQvality(beta0, beta1, Xi, Yi)
+"""
 
 ##
 # Hyperbola
@@ -692,15 +700,15 @@ Zi = np.array([
 ##
 
 Xi = np.array([
-    3.9, 4.2, 5.6, 5.7, 6.6, 7.2, 10.8, 10.7, 12.3, 15.7, 24.7
+    47.8, 34.9, 44.8, 62.3, 36.2, 64.3, 49.1, 64.4, 43.2, 47, 56.4, 68.1, 50.9
 ])
 
 Yi = np.array([
-    3.6, 4.3, 3.4, 3.7, 7.2, 3.0, 12.3, 7.0, 23.7, 23.6, 46.1
+    9.2, 10.2, 11.9, 8, 15.3, 11.7, 16.6, 7.9, 7.2, 10.2, 9.4, 10.6, 12.8
 ])
 
 # pro normální rozdělení
-#XiYidependenceNormal(Xi, Yi)
+XiYidependenceNormal(Xi, Yi)
 
 # pro spojité rozdělení
 #XiYidependenceSpojit(Xi, Yi)
